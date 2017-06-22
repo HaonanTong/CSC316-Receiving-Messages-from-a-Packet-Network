@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>CSC 316, Fall 2015, Project 1</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <meta http-equiv="description" content="CSC 216-003 Spring 2005 Program 4 Specification">
+  </head>
+  <body style="background-color:#FFFFFF; margin-left:4px; margin-top:4px; margin-right:0px;">
+	<table width="770" height="70" border="2" align="center" cellpadding="2" cellspacing="2">
+		<tr>
+			<td width="518" style="text-align:center; vertical-align:middle;">
+				<h3 class="title">Fall 2015, Project 1: Receiving Messages from a Packet Network</h3>		  </td>
+			<td width="180" align="right"><div align="left">Based on a CSC 216 project by Steve Bento a long time ago</div></td>
+		</tr>
+  </table>
+    
+      <ul>
+        <li>This assignment must be submitted by <em><strong>11:45 pm, on Sunday, September 27</strong></em>.</li>
+        <li>You should submit a <em><strong>single .zip</strong></em><code></code> file of your code; no <code>.tar</code>, <code>.jar</code>, <code>.bar</code>, <code>.czar</code></li>, etc. files. And no separate Java source or class files.
+        <li> It will count as 10% of your final grade. </li>
+        <li>You must <em><strong>register your team</strong></em> by <em><strong>5:00 PM on Friday, September 18</strong></em>, a little more than a week before. submitting the project. To do so post a note on Piazza in the <strong>teams</strong> folder with the name and unity id of your project leader (the solution will be submitted under that unity id), the names and uid's of other team members (three or four), and (optionally -- if you want to use a Piazza group to communicate with other team members) a name for your team.</li>
+      </ul>
+      <hr class="thin"/>
+            
+		<h4>Academic Integrity (for this and all programming projects)</h4>
+		<p>You <em><strong>are</strong></em> permitted to discuss your general approach, algorithms, and results with students outside of your team. However, <em><strong>no</strong></em> actual code or documentation can be shared. This prohibition applies to code produced by another person in or for previous offerings of this course or another course. Any such sharing will be treated as an academic integrity violation. For the purposes of this particular project -- the same rules may not apply to later ones -- you are not allowed to use actual code (as opposed to pseudocode) from any other source, whether it be text, internet, my notes, etc.</p>
+		<p>In case of doubt about what is permitted, ask the instructor or check the<a href="http://policies.ncsu.edu/policy/pol-11-35-01"> university policy on academic integrity</a>, scroll down to Section 8 - ACADEMIC MISCONDUCT.</p>
+		
+		<h4>Purpose</h4>
+		<p>Review of linked lists and abstract data types (ADT's). </p>
+		<h4>Overview</h4>
+		<p>Modern computer networks take messages and break them into smaller units called packets.
+            Because of redundancy, dynamic routing techniques, and other networking mechanisms, packets
+            often arrive at their destination in an order different from the order in which they were sent. The end node computer must put 
+            these packets in the correct order and re-assemble the original messages. Your task is to
+            design and implement a program that does this.</p>
+		<h4>Ground rules (these apply to all programming assignments unless there are specific exceptions) </h4>
+		<p><strong><em>Your program must not</em></strong> <em><strong>import anything</strong></em>: no list, queue, priority queue or any other classes. You are <em><strong>not allowed to use arrays or generics.</strong></em> For example, the exclusion of imports rules out Java collections and array lists; the exclusion of generics also rules out array lists as well as all of the code presented in the textbook. </p>
+            <p> The only exception for this assignment (and all subsequent ones) is use of the Scanner class for reading input and various input/output utilities. So it's ok to have</p>
+            <pre>import java.util.Scanner;
+import java.io.*; </pre>
+            <hr class="thin"/>
+			
+		<h4>Requirements for Implementing a Network Message Receiver.</h4>
+		<p>The arrival of packets will be simulated by an input file with multiple lines, each having the  format:</p>
+		<pre><em>message_number </em><em>packet_number string</em>
+</pre>
+		<p>It is assumed that the string does not contain any blanks. For purposes of the simulation, the string represents the contents of the packet. Output is equally simple. For each message, there is a block of the form</p>
+		<pre>--- Message <em>i
+</em><em>string_i,1
+string_i,2
+...
+string_i,n
+</em>--- End Message <em>i</em></pre>
+		<p>where <em>string_i,j </em> is packet <em>j</em> of message <em>i. </em>If any packet is missing, i.e., there was no input line of the form</p>
+		<pre><em>i j </em><em>string</em></pre>
+		<p>for packet <em>j </em>of some message <em>i </em> that had other packets with numbers larger than <em>j</em>, then <em>string</em><em>_i,j </em>should be replaced with</p>
+		<pre>WARNING: packet <em>j </em>of message <em>i </em>is missing
+</pre>
+		If there are two packets with the same message and packet number, only the <em>last </em>one to arrive should be used. You do not need to print a warning in this case. <br>
+		<p>Message blocks in the output should be separated by blank lines and sorted in order of increasing message number. Message numbers are not necessarily sequential; some may be missing. For example, the input file might have packets  for messages 3, 17, 91, and 246, but not for any others.
+		<p> Message numbers are arbitrary integers. Packet numbers always start at 1; in other words, if there is no packet 1 for a message, a warning should be generated.
+        <p>Your program should be called Receiver and executed as follows.        
+  <pre>java Receiver <em>input_file output_file</em>
+</pre>
+<hr>
+
+        <h4>Example</h4>
+        <p>Suppose the input is</p>
+        <pre>3 2 morning
+17 1 See
+10 3 you
+17 2 forget
+10 1 How
+17 3 later
+3 1 Good
+17 2 you
+10 4 doing</pre>
+        <p>The output will be</p>
+        <pre>
+--- Message 3
+Good
+morning
+--- End Message 3
+
+--- Message 10
+How
+WARNING: packet 2 of message 10 is missing
+you
+doing
+--- End Message 10
+
+--- Message 17
+See
+you
+later
+--- End Message 17
+</pre>
+        <hr>
+        <h4>Implementation Hints</h4>
+        <p>You can implement this program any way you like within the above rules. A good way to do it would be to have a list of messages and have each message contain a list of the packets within it. Sorting can be done as you go along, by inserting messages/packets in the proper position when they arrive, or at the end. Based on the rules, you must, of course, implement these lists yourself.</p>
+        <p><em>However, in order to get full credit for the effective use of ADT's, I would expect your solution to have some elements of the following:        </em></p>
+        <ul>
+        <li>the main program should have to call only two methods, one to read input and another to read output; for maximum flexibility, these should be designed in such a way that input could come from somewhere other than a file (standard input to allow for Unix pipes, for example) via a Scanner, and similarly with output; in real life the software would fire up distinct threads for each of these so that the program could run indefinitely, reading packets from an input device and sending messages to some output device</li>
+          <li>another ADT should provide the functionality required of single operations in the specs: a method that handles a single packet and two iterators, one that iterates over the set of messages and another that, for each message, yields the packets in the correct order (the iterator would also give the client a way to generate the warnings, perhaps via a Java exception that is caught by the method that handles output</li>
+          <li>another ADT could handle methods required to maintain the list structure (not a single linked list) most of you would probably use; this ADT would be oblivious to the fact that the data structure is being used to handle the packets</li>
+          <li>at the lowest level there is a linked list or queue ADT similar to one provided by Java except that you would implement it yourself; I will allow you to make this one generic since there may be two different types involved.</li>
+        </ul>
+        <p>The above description is the&nbsp;<em>ideal.&nbsp;</em>Your solution should include at least some of its elements and it may not fit directly or entirely into this framework.</p>
+        <hr>
+        <h4>Comments</h4>
+        <p>This simulation is obviously a gross oversimplification of how network traffic really works, but the part about packets not arriving in order is real. Packets sometimes take different routes to avoid congestion or a router along the way may not process them in first-in/first-out order. Or a packet may get lost and need to be resent. The sender typically waits for an acknowledgement that the message has been received and re-sends the message if there is no acknowledgment by some fixed delay. </p>
+        <p>Some aspects that are not captured here are</p>
+        <ul>
+          <li>The flow of incoming messages never stops.</li>
+          <li>Messages usually have headers that announce their length and other characteristics.</li>
+          <li>Packets have lots of other information: some may need to be routed to other destinations, some are interpreted as sound or video rather than text, etc.  </li>
+        </ul>
+        <hr>
+        <h4>Grading</h4>
+                 <table border="1">
+            <caption>
+              <strong>grades for various aspects of the assignment              </strong>
+            </caption>
+            <tr>
+              <td width="442"><p align="left">Compiles and executes on the example given above without error</p></td>
+              <td width="44"><div align="center">20 % </div></td>
+            </tr>
+            <tr>
+              <td><div align="left">Gives correct results on boundary cases </div></td>
+              <td><div align="center">15 % </div></td>
+            </tr>
+            <tr>
+              <td><div align="left">Gives correct results on large test inputs </div></td>
+              <td><div align="center">40 % </div></td>
+            </tr>
+            <tr>
+              <td><p align="left">Style: Separate classes for data structures, use of ADT methods,<br> code is easy to read and verify and includes appropriate Javadoc comments </p>              </td>
+              <td><div align="center">
+              15 %</div></td>
+            </tr>
+            <tr>
+              <td><div align="left">Team members give you good evaluations on your participation and you give me useful evaluations of your team members</div></td>
+              <td><div align="center">10 %</div></td>
+            </tr>
+  </table>
+                 <p>Team evaluation forms will be posted along with the projects</p>
+</body>
+</html>
+
